@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>ai-meeting</artifactId>
+        <groupId>ai-meeting</groupId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ai-meeting-service</artifactId>
+
+    <dependencies>
+        <!-- ======= -->
+        <!-- 模块依赖 -->
+        <!-- ======= -->
+        <dependency>
+            <groupId>ai-meeting</groupId>
+            <artifactId>ai-meeting-application</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai-meeting</groupId>
+            <artifactId>ai-meeting-api</artifactId>
+        </dependency>
+
+        <!-- ======= -->
+        <!-- 二方依赖 -->
+        <!-- ======= -->
+        <dependency>
+            <groupId>com.transformer</groupId>
+            <artifactId>transformer-dubbo</artifactId>
+        </dependency>
+
+        <!-- ======= -->
+        <!-- 三方依赖 -->
+        <!-- ======= -->
+        <!-- spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+
+        <!-- ======= -->
+        <!-- 测试依赖 -->
+        <!-- ======= -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+        </dependency>
+    </dependencies>
+</project>
