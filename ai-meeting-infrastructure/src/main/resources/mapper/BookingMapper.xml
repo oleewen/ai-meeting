@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.only.ai.meeting.infrastructure.mapper.BookingMapper">
+
+    <resultMap id="BaseResultMap" type="com.only.ai.meeting.infrastructure.entity.BookingEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="room_id" property="roomId" jdbcType="BIGINT"/>
+        <result column="room_name" property="roomName" jdbcType="VARCHAR"/>
+        <result column="date" property="date" jdbcType="DATE"/>
+        <result column="start_time" property="startTime" jdbcType="TIME"/>
+        <result column="end_time" property="endTime" jdbcType="TIME"/>
+        <result column="subject" property="subject" jdbcType="VARCHAR"/>
+        <result column="attendee_count" property="attendeeCount" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="sign_in_time" property="signInTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM booking WHERE id = #{id}
+    </select>
+
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT * FROM booking
+        WHERE user_id = #{userId}
+        ORDER BY date DESC, start_time DESC
+    </select>
+
+    <select id="findByUserIdAndDateRange" resultMap="BaseResultMap">
+        SELECT * FROM booking
+        WHERE user_id = #{userId}
+        AND date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY date DESC, start_time DESC
+    </select>
+
+    <select id="findByRoomIdAndDate" resultMap="BaseResultMap">
+        SELECT * FROM booking
+        WHERE room_id = #{roomId}
+        AND date = #{date}
+        AND status NOT IN ('CANCELLED')
+        ORDER BY start_time
+    </select>
+
+    <select id="countConflicts" resultType="int">
+        SELECT COUNT(*)
+        FROM booking
+        WHERE room_id = #{roomId}
+        AND date = #{date}
+        AND status NOT IN ('CANCELLED')
+        <if test="excludeBookingId != null">
+            AND id != #{excludeBookingId}
+        </if>
+        AND (
+            (start_time &lt; #{endTime} AND end_time &gt; #{startTime})
+        )
+    </select>
+
+    <select id="findCompletedBookings" resultMap="BaseResultMap">
+        SELECT * FROM booking
+        WHERE status IN ('PENDING', 'SIGNED_IN')
+        AND CONCAT(date, ' ', end_time) &lt;= #{beforeTime}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO booking (
+            user_id, user_name, room_id, room_name, date, start_time, end_time,
+            subject, attendee_count, remark, status, sign_in_time, create_time, update_time
+        )
+        VALUES (
+            #{userId}, #{userName}, #{roomId}, #{roomName}, #{date}, #{startTime}, #{endTime},
+            #{subject}, #{attendeeCount}, #{remark}, #{status}, #{signInTime}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE booking
+        SET status = #{status},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

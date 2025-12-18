@@ -10,7 +10,7 @@
 
     <groupId>ai-meeting</groupId>
     <artifactId>ai-meeting</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>name</name>
     <description>description</description>
     <packaging>pom</packaging>
@@ -20,7 +20,6 @@
         <project.encoding>UTF-8</project.encoding>
         <java.version>17</java.version>
         <revision>1.0.0-SNAPSHOT</revision>
-        <transformer.version>1.2.10</transformer.version>
         <spring.boot.version>2.7.10</spring.boot.version>
     </properties>
 
@@ -43,88 +42,43 @@
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-service</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-infrastructure</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-application</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-domain</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-common</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-api</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>ai-meeting</groupId>
                 <artifactId>ai-meeting-client</artifactId>
-                <version>${revision}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
             <!-- ======= -->
             <!-- 二方依赖 -->
             <!-- ======= -->
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-call</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-common</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-dubbo</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-util</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-exception</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-dao</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.transformer</groupId>-->
-<!--                <artifactId>transformer-context</artifactId>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.transformer</groupId>-->
-<!--                <artifactId>transformer-es</artifactId>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.transformer</groupId>-->
-<!--                <artifactId>transformer-event</artifactId>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.transformer</groupId>-->
-<!--                <artifactId>transformer-mq</artifactId>-->
-<!--            </dependency>-->
+            <!-- transformer框架依赖已移除，改用Spring Boot标准功能 -->
 
             <!-- ======= -->
             <!-- 三方依赖 -->
@@ -144,11 +98,7 @@
                 <artifactId>mapstruct</artifactId>
                 <version>1.5.0.Final</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>5.1.5.RELEASE</version>
-            </dependency>
+            <!-- spring-webmvc 由 spring-boot-starter-web 自动管理，不需要显式声明版本 -->
             <!-- alibaba -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -171,15 +121,29 @@
                 <artifactId>swagger-annotations</artifactId>
                 <version>1.6.2</version>
             </dependency>
+            <!-- SpringDoc OpenAPI (替代Springfox，更好的Spring Boot 2.7兼容性) -->
             <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>2.7.0</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>1.6.9</version>
             </dependency>
+            <!-- H2数据库 -->
             <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>2.7.0</version>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>2.1.214</version>
+            </dependency>
+            <!-- Jackson for JSON处理 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.13.5</version>
+            </dependency>
+            <!-- Spring Boot Starter JDBC -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+                <version>${spring.boot.version}</version>
             </dependency>
 
             <!-- ======= -->

@@ -1,1 +1,35 @@
-*/target/*
+# Java/Maven
+*/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.gradle/
+build/
+out/
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd

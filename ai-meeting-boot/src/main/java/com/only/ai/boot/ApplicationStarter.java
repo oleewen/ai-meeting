@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -22,7 +24,9 @@ import java.util.List;
  * @since 2020-05-22
  */
 @SpringBootApplication
-public class ApplicationStarter extends WebMvcConfigurerAdapter {
+@EnableScheduling
+@ComponentScan(basePackages = {"com.only.ai"})
+public class ApplicationStarter implements WebMvcConfigurer {
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         ObjectMapper objectMapper = new ObjectMapper();

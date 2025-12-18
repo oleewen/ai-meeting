@@ -1,0 +1,572 @@
+openapi: 3.0.3
+info:
+  title: 会议室预约系统 API
+  description: 会议室预约系统的RESTful API接口文档
+  version: 1.0.0
+  contact:
+    name: AI Meeting Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: 开发环境
+
+tags:
+  - name: 会议室
+    description: 会议室相关接口
+  - name: 预约
+    description: 预约相关接口
+
+paths:
+  /meeting-rooms:
+    get:
+      tags:
+        - 会议室
+      summary: 查询可用会议室
+      description: 根据日期和时间段查询可用的会议室列表，支持按地点、容量、设备等条件筛选
+      operationId: queryAvailableRooms
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: 预约日期，格式：yyyy-MM-dd
+          schema:
+            type: string
+            format: date
+            example: "2025-01-27"
+        - name: startTime
+          in: query
+          required: true
+          description: 开始时间，格式：HH:mm
+          schema:
+            type: string
+            format: time
+            example: "09:00"
+        - name: endTime
+          in: query
+          required: true
+          description: 结束时间，格式：HH:mm
+          schema:
+            type: string
+            format: time
+            example: "10:00"
+        - name: location
+          in: query
+          required: false
+          description: 地点筛选（如：1楼、2楼）
+          schema:
+            type: string
+            example: "1楼"
+        - name: minCapacity
+          in: query
+          required: false
+          description: 最小容量
+          schema:
+            type: integer
+            minimum: 1
+            example: 10
+        - name: equipment
+          in: query
+          required: false
+          description: 设备筛选（多个设备用逗号分隔，如：投影仪,视频会议）
+          schema:
+            type: string
+            example: "投影仪,视频会议"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultListMeetingRoom'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+  /meeting-rooms/{roomId}/schedule:
+    get:
+      tags:
+        - 会议室
+      summary: 查看会议室当日排期
+      description: 查看指定会议室在指定日期的完整时间轴排期
+      operationId: getRoomSchedule
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          description: 会议室ID
+          schema:
+            type: integer
+            format: int64
+        - name: date
+          in: query
+          required: true
+          description: 日期，格式：yyyy-MM-dd
+          schema:
+            type: string
+            format: date
+            example: "2025-01-27"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultRoomSchedule'
+        '404':
+          description: 会议室不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+  /bookings:
+    post:
+      tags:
+        - 预约
+      summary: 创建预约
+      description: 创建新的会议室预约
+      operationId: createBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: 预约创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultBooking'
+        '400':
+          description: 请求参数错误或预约冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '409':
+          description: 预约冲突（时间段已被占用）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+    get:
+      tags:
+        - 预约
+      summary: 查看我的预定
+      description: 查询当前用户的所有预约记录，支持按日期范围和状态筛选
+      operationId: getMyBookings
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          description: 开始日期，格式：yyyy-MM-dd
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: false
+          description: 结束日期，格式：yyyy-MM-dd
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          required: false
+          description: 状态筛选（PENDING/SIGNED_IN/COMPLETED/CANCELLED/NOT_SIGNED_IN）
+          schema:
+            type: string
+            enum: [PENDING, SIGNED_IN, COMPLETED, CANCELLED, NOT_SIGNED_IN]
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultListBooking'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+  /bookings/{bookingId}:
+    get:
+      tags:
+        - 预约
+      summary: 查看预约详情
+      description: 查看指定预约的详细信息
+      operationId: getBookingDetail
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: 预约ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultBooking'
+        '404':
+          description: 预约不存在或无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+    delete:
+      tags:
+        - 预约
+      summary: 取消预约
+      description: 取消指定的预约（需满足取消时间限制）
+      operationId: cancelBooking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: 预约ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 取消成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultVoid'
+        '400':
+          description: 不允许取消（如距离会议开始时间太近）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '404':
+          description: 预约不存在或无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+  /bookings/{bookingId}/sign-in:
+    post:
+      tags:
+        - 预约
+      summary: 会议签到
+      description: 对指定预约进行签到（需在签到时间窗口内）
+      operationId: signInBooking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: 预约ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 签到成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultBooking'
+        '400':
+          description: 不在签到时间窗口内
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '404':
+          description: 预约不存在或无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+
+components:
+  schemas:
+    Result:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 响应码，200表示成功
+        message:
+          type: string
+          description: 响应消息
+        data:
+          type: object
+          description: 响应数据
+
+    ResultListMeetingRoom:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/MeetingRoomDTO'
+
+    ResultRoomSchedule:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/RoomScheduleDTO'
+
+    ResultBooking:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/BookingDTO'
+
+    ResultListBooking:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/BookingDTO'
+
+    ResultVoid:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            data:
+              type: object
+              nullable: true
+
+    ErrorResult:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 错误码
+        message:
+          type: string
+          description: 错误消息
+        data:
+          type: object
+          nullable: true
+
+    MeetingRoomDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 会议室ID
+        name:
+          type: string
+          description: 会议室名称
+          example: "会议室A"
+        location:
+          type: string
+          description: 地点/楼层
+          example: "1楼"
+        capacity:
+          type: integer
+          description: 可容纳人数
+          example: 10
+        equipment:
+          type: array
+          items:
+            type: string
+          description: 支持设备列表
+          example: ["投影仪", "白板"]
+        status:
+          type: string
+          description: 可用状态
+          enum: [AVAILABLE, UNAVAILABLE]
+          example: "AVAILABLE"
+        description:
+          type: string
+          description: 描述信息
+          example: "小型会议室，适合小组讨论"
+
+    RoomScheduleDTO:
+      type: object
+      properties:
+        roomId:
+          type: integer
+          format: int64
+          description: 会议室ID
+        roomName:
+          type: string
+          description: 会议室名称
+        date:
+          type: string
+          format: date
+          description: 日期
+        timeSlots:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlotDTO'
+          description: 时间段列表（按时间排序）
+
+    TimeSlotDTO:
+      type: object
+      properties:
+        startTime:
+          type: string
+          format: time
+          description: 开始时间
+        endTime:
+          type: string
+          format: time
+          description: 结束时间
+        status:
+          type: string
+          description: 状态（AVAILABLE/OCCUPIED）
+          enum: [AVAILABLE, OCCUPIED]
+        bookingId:
+          type: integer
+          format: int64
+          nullable: true
+          description: 预约ID（如果被占用）
+        subject:
+          type: string
+          nullable: true
+          description: 会议主题（如果被占用）
+
+    CreateBookingRequest:
+      type: object
+      required:
+        - roomId
+        - date
+        - startTime
+        - endTime
+        - subject
+        - attendeeCount
+      properties:
+        roomId:
+          type: integer
+          format: int64
+          description: 会议室ID
+        date:
+          type: string
+          format: date
+          description: 预约日期，格式：yyyy-MM-dd
+          example: "2025-01-27"
+        startTime:
+          type: string
+          format: time
+          description: 开始时间，格式：HH:mm
+          example: "09:00"
+        endTime:
+          type: string
+          format: time
+          description: 结束时间，格式：HH:mm
+          example: "10:00"
+        subject:
+          type: string
+          maxLength: 200
+          description: 会议主题
+          example: "项目评审会议"
+        attendeeCount:
+          type: integer
+          minimum: 1
+          description: 参会人数
+          example: 8
+        remark:
+          type: string
+          maxLength: 500
+          description: 备注
+          example: "需要投影仪"
+
+    BookingDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 预约ID
+        userId:
+          type: string
+          description: 预约人用户ID
+        userName:
+          type: string
+          description: 预约人姓名
+        roomId:
+          type: integer
+          format: int64
+          description: 会议室ID
+        roomName:
+          type: string
+          description: 会议室名称
+        date:
+          type: string
+          format: date
+          description: 预约日期
+        startTime:
+          type: string
+          format: time
+          description: 开始时间
+        endTime:
+          type: string
+          format: time
+          description: 结束时间
+        subject:
+          type: string
+          description: 会议主题
+        attendeeCount:
+          type: integer
+          description: 参会人数
+        remark:
+          type: string
+          nullable: true
+          description: 备注
+        status:
+          type: string
+          description: 状态
+          enum: [PENDING, SIGNED_IN, COMPLETED, CANCELLED, NOT_SIGNED_IN]
+        signInTime:
+          type: string
+          format: date-time
+          nullable: true
+          description: 签到时间
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT认证（待实现）
+
+security:
+  - bearerAuth: []

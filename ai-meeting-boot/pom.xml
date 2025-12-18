@@ -3,7 +3,7 @@
     <parent>
         <artifactId>ai-meeting</artifactId>
         <groupId>ai-meeting</groupId>
-        <version>${revision}</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,9 +30,16 @@
         <!-- ======= -->
         <!-- 三方依赖 -->
         <!-- ======= -->
+        <!-- spring-webmvc 已由 spring-boot-starter-web 包含，无需单独引入 -->
+        <!-- Spring Boot Starter -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Spring Boot Starter Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 
@@ -46,6 +53,9 @@
                 <configuration>
                     <mainClass>${start-class}</mainClass>
                     <layout>ZIP</layout>
+                    <jvmArguments>
+                        -Dapp.secret=dev-secret-key-for-meeting-room-booking-system
+                    </jvmArguments>
                 </configuration>
                 <executions>
                     <execution>

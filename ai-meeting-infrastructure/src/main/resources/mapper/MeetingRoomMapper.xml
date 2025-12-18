@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.only.ai.meeting.infrastructure.mapper.MeetingRoomMapper">
+
+    <resultMap id="BaseResultMap" type="com.only.ai.meeting.infrastructure.entity.MeetingRoomEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="capacity" property="capacity" jdbcType="INTEGER"/>
+        <result column="equipment" property="equipment" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM meeting_room WHERE id = #{id}
+    </select>
+
+    <select id="findAvailableRooms" resultMap="BaseResultMap">
+        SELECT mr.*
+        FROM meeting_room mr
+        WHERE mr.status = 'AVAILABLE'
+        AND mr.id NOT IN (
+            SELECT DISTINCT b.room_id
+            FROM booking b
+            WHERE b.date = #{date}
+            AND b.status NOT IN ('CANCELLED')
+            AND (
+                (b.start_time &lt; #{endTime} AND b.end_time &gt; #{startTime})
+            )
+        )
+    </select>
+
+    <select id="findByLocation" resultMap="BaseResultMap">
+        SELECT * FROM meeting_room WHERE location = #{location} AND status = 'AVAILABLE'
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO meeting_room (name, location, capacity, equipment, status, description, create_time, update_time)
+        VALUES (#{name}, #{location}, #{capacity}, #{equipment}, #{status}, #{description}, NOW(), NOW())
+    </insert>
+
+    <update id="update">
+        UPDATE meeting_room
+        SET name = #{name},
+            location = #{location},
+            capacity = #{capacity},
+            equipment = #{equipment},
+            status = #{status},
+            description = #{description},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
