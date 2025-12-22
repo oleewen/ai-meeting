@@ -18,7 +18,7 @@ public class MapperScannerConfig {
     public MapperScannerConfigurer buildMapperScannerConfigurer() {
         MapperScannerConfigurer configurer = new MapperScannerConfigurer();
         configurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
-        configurer.setBasePackage("com.only.ai.common.resource");
+        configurer.setBasePackage("com.only.ai.meetingroom.infrastructure.mapper");
         return configurer;
     }
 }

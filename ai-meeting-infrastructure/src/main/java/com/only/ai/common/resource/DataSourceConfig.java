@@ -1,55 +1,42 @@
 package com.only.ai.common.resource;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
 /**
- * 数据源
+ * H2数据源配置
+ * 简化版本，使用Spring标准数据源
  *
- * @author only
- * @since 2020-05-22
+ * @author ai-meeting
+ * @since 2024-01-15
  */
 @Configuration
 public class DataSourceConfig {
-    @Value("${db.url}")
-    private String promotionDBUrl;
-    @Value("${db.username}")
-    private String promotionDBUsername;
-    @Value("${db.password}")
-    private String promotionDBPassword;
-    @Value("${db.maxactive}")
-    private int promotionDBmaxActive;
-    @Value("${db.minidle}")
-    private int promotionDBminIdle;
+    
+    @Value("${spring.datasource.url}")
+    private String url;
+    
+    @Value("${spring.datasource.username}")
+    private String username;
+    
+    @Value("${spring.datasource.password}")
+    private String password;
+    
+    @Value("${spring.datasource.driver-class-name}")
+    private String driverClassName;
 
     @Bean("dataSource")
     public DataSource buildDataSource() {
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setUrl(promotionDBUrl);
-        dataSource.setUsername(promotionDBUsername);
-        dataSource.setPassword(promotionDBPassword);
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-
-        dataSource.setInitialSize(promotionDBminIdle);
-        dataSource.setMaxActive(promotionDBmaxActive);
-        dataSource.setMinIdle(promotionDBminIdle);
-
-        dataSource.setTimeBetweenEvictionRunsMillis(30000);
-
-        dataSource.setMinEvictableIdleTimeMillis(15000);
-
-        dataSource.setValidationQuery("select 1");
-        dataSource.setTestWhileIdle(true);
-        dataSource.setTestOnBorrow(false);
-        dataSource.setTestOnReturn(false);
-
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
+        dataSource.setDriverClassName(driverClassName);
         return dataSource;
-
     }
-
 }
 

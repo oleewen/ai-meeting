@@ -22,10 +22,6 @@
         <!-- ======= -->
         <!-- 模块依赖 -->
         <!-- ======= -->
-        <dependency>
-            <groupId>ai-meeting</groupId>
-            <artifactId>ai-meeting-api</artifactId>
-        </dependency>
 
         <!-- ======= -->
         <!-- 二方依赖 -->

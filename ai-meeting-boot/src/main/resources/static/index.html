@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=3.0">
+    <meta name="description" content="会议室预约系统 - 高效管理会议室预约">
+    <meta name="keywords" content="会议室,预约,管理,办公">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>会议室预约系统</title>
+    
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="css/style.css" as="style">
+    <link rel="preload" href="js/app.js" as="script">
+    
+    <!-- 样式表 -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- 浏览器兼容性 -->
+    <!--[if lt IE 9]>
+        <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+    
+    <!-- PWA支持 -->
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="会议室预约">
+    
+    <!-- 图标 -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>会议室预约系统</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="#" class="nav-link active" data-page="search">会议室查询</a>
+                <a href="#" class="nav-link" data-page="booking">我的预约</a>
+                <a href="#" class="nav-link" data-page="create">创建预约</a>
+            </div>
+            <div class="nav-user">
+                <span id="currentUser">用户: admin</span>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 会议室查询页面 -->
+            <div id="search-page" class="page active">
+                <div class="page-header">
+                    <h2>会议室查询</h2>
+                    <p>查找适合您需求的会议室</p>
+                </div>
+
+                <!-- 搜索表单 -->
+                <div class="search-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startTime">开始时间</label>
+                            <input type="datetime-local" id="startTime" name="startTime">
+                        </div>
+                        <div class="form-group">
+                            <label for="endTime">结束时间</label>
+                            <input type="datetime-local" id="endTime" name="endTime">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">地点</label>
+                            <select id="location" name="location">
+                                <option value="">全部地点</option>
+                                <option value="1楼东区">1楼东区</option>
+                                <option value="1楼西区">1楼西区</option>
+                                <option value="2楼东区">2楼东区</option>
+                                <option value="2楼西区">2楼西区</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="minCapacity">最小容量</label>
+                            <input type="number" id="minCapacity" name="minCapacity" min="1" placeholder="人数">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>设备要求</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="equipment" value="PROJECTOR">
+                                    <span>投影仪</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="equipment" value="VIDEO_CONFERENCE">
+                                    <span>视频会议</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="equipment" value="WHITEBOARD">
+                                    <span>白板</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="equipment" value="LARGE_SCREEN">
+                                    <span>大屏幕</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sortBy">排序方式</label>
+                            <select id="sortBy" name="sortBy">
+                                <option value="">默认排序</option>
+                                <option value="capacity">容量升序</option>
+                                <option value="capacity_desc">容量降序</option>
+                                <option value="location">按地点</option>
+                                <option value="name">按名称</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="searchBtn" class="btn btn-primary">搜索会议室</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">重置</button>
+                    </div>
+                </div>
+
+                <!-- 搜索结果 -->
+                <div class="search-results">
+                    <div class="results-header">
+                        <h3>搜索结果</h3>
+                        <span id="resultsCount" class="results-count">共 0 个会议室</span>
+                    </div>
+                    <div id="roomsList" class="rooms-list">
+                        <!-- 会议室列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 我的预约页面 -->
+            <div id="booking-page" class="page">
+                <div class="page-header">
+                    <h2>我的预约</h2>
+                    <p>管理您的会议室预约</p>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="quick-actions">
+                    <a href="#" class="quick-action-btn" id="todayBookingsBtn">
+                        <span class="icon">📅</span>
+                        <span class="text">今日预约</span>
+                    </a>
+                    <a href="#" class="quick-action-btn" id="upcomingBookingsBtn">
+                        <span class="icon">⏰</span>
+                        <span class="text">即将到来</span>
+                    </a>
+                    <a href="#" class="quick-action-btn" id="historyBookingsBtn">
+                        <span class="icon">📋</span>
+                        <span class="text">历史记录</span>
+                    </a>
+                </div>
+
+                <!-- 筛选条件 -->
+                <div class="booking-filters">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="filterStartDate">开始日期</label>
+                            <input type="date" id="filterStartDate" name="startDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterEndDate">结束日期</label>
+                            <input type="date" id="filterEndDate" name="endDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="filterStatus">状态</label>
+                            <select id="filterStatus" name="status">
+                                <option value="">全部状态</option>
+                                <option value="ACTIVE">有效</option>
+                                <option value="CANCELLED">已取消</option>
+                                <option value="CHECKED_IN">已签到</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="filterBookingsBtn" class="btn btn-primary">筛选</button>
+                        <button type="button" id="resetFilterBtn" class="btn btn-secondary">重置</button>
+                    </div>
+                </div>
+
+                <!-- 预约列表 -->
+                <div class="booking-list">
+                    <div class="results-header">
+                        <h3>预约列表</h3>
+                        <span id="bookingCount" class="results-count">共 0 条预约</span>
+                    </div>
+                    <div id="bookingsList">
+                        <!-- 预约列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建预约页面 -->
+            <div id="create-page" class="page">
+                <div class="page-header">
+                    <h2>创建预约</h2>
+                    <p>预约会议室</p>
+                </div>
+                
+                <!-- 创建预约表单 -->
+                <div class="create-form">
+                    <form id="createBookingForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="selectedRoom">选择会议室 *</label>
+                                <select id="selectedRoom" name="meetingRoomId" required>
+                                    <option value="">请选择会议室</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="attendeeCount">参会人数 *</label>
+                                <input type="number" id="attendeeCount" name="attendeeCount" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bookingStartTime">开始时间 *</label>
+                                <input type="datetime-local" id="bookingStartTime" name="startTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bookingEndTime">结束时间 *</label>
+                                <input type="datetime-local" id="bookingEndTime" name="endTime" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">会议主题 *</label>
+                            <input type="text" id="subject" name="subject" placeholder="请输入会议主题" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">备注</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="会议备注信息（可选）"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="cancelCreateBtn" class="btn btn-secondary">取消</button>
+                            <button type="submit" id="submitBookingBtn" class="btn btn-primary">创建预约</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 会议室详情模态框 -->
+    <div id="roomDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalRoomName">会议室详情</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="roomDetailContent">
+                    <!-- 详情内容将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeModal">关闭</button>
+                <button type="button" class="btn btn-primary" id="bookRoomBtn">预约此会议室</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/create.js"></script>
+    <script src="js/booking.js"></script>
+</body>
+</html>

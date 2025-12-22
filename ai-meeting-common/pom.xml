@@ -22,23 +22,10 @@
         <!-- ======= -->
         <!-- 二方依赖 -->
         <!-- ======= -->
-        <dependency>
-            <groupId>com.transformer</groupId>
-            <artifactId>transformer-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.transformer</groupId>
-            <artifactId>transformer-util</artifactId>
-        </dependency>
 
         <!-- ======= -->
         <!-- 三方依赖 -->
         <!-- ======= -->
-        <!-- effective -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
 
         <!-- ======= -->
         <!-- 测试依赖 -->

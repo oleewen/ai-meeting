@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.only.ai.meetingroom.infrastructure.mapper.UserMapper">
+
+    <resultMap id="UserResultMap" type="com.only.ai.meetingroom.infrastructure.po.UserPO">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password_hash" property="passwordHash"/>
+        <result column="email" property="email"/>
+        <result column="display_name" property="displayName"/>
+        <result column="role" property="role"/>
+        <result column="active" property="active"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="UserResultMap">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <select id="selectByUsername" resultMap="UserResultMap">
+        SELECT * FROM users WHERE username = #{username}
+    </select>
+
+    <select id="selectByEmail" resultMap="UserResultMap">
+        SELECT * FROM users WHERE email = #{email}
+    </select>
+    <insert id="insert">
+        INSERT INTO users (id, username, password_hash, email, display_name, role, active)
+        VALUES (#{id}, #{username}, #{passwordHash}, #{email}, #{displayName}, #{role}, #{active})
+    </insert>
+
+    <update id="update">
+        UPDATE users SET
+        username = #{username},
+        password_hash = #{passwordHash},
+        email = #{email},
+        display_name = #{displayName},
+        role = #{role},
+        active = #{active}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+</mapper>

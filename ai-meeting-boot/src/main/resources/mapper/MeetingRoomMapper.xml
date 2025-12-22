@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.only.ai.meetingroom.infrastructure.mapper.MeetingRoomMapper">
+
+    <resultMap id="MeetingRoomResultMap" type="com.only.ai.meetingroom.infrastructure.po.MeetingRoomPO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="location" property="location"/>
+        <result column="capacity" property="capacity"/>
+        <result column="equipments" property="equipments"/>
+        <result column="active" property="active"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="MeetingRoomResultMap">
+        SELECT * FROM meeting_rooms WHERE id = #{id}
+    </select>
+
+    <select id="selectAllActive" resultMap="MeetingRoomResultMap">
+        SELECT * FROM meeting_rooms WHERE active = true ORDER BY location, name
+    </select>
+    <select id="selectAvailableInTimeSlot" resultMap="MeetingRoomResultMap">
+        SELECT mr.* FROM meeting_rooms mr
+        WHERE mr.active = true
+        AND mr.id NOT IN (
+            SELECT DISTINCT b.meeting_room_id FROM bookings b
+            WHERE b.status = 'ACTIVE'
+            AND ((b.start_time &lt; #{endTime} AND b.end_time &gt; #{startTime}))
+        )
+        ORDER BY mr.location, mr.name
+    </select>
+
+    <select id="selectByFilters" resultMap="MeetingRoomResultMap">
+        SELECT * FROM meeting_rooms
+        WHERE active = true
+        <if test="location != null and location != ''">
+            AND location LIKE CONCAT('%', #{location}, '%')
+        </if>
+        <if test="minCapacity != null">
+            AND capacity >= #{minCapacity}
+        </if>
+        <if test="requiredEquipments != null and requiredEquipments.size() > 0">
+            <foreach collection="requiredEquipments" item="equipment" separator=" AND ">
+                AND JSON_CONTAINS(equipments, CONCAT('"', #{equipment}, '"'))
+            </foreach>
+        </if>
+        ORDER BY location, name
+    </select>
+    <select id="selectAvailableByFilters" resultMap="MeetingRoomResultMap">
+        SELECT mr.* FROM meeting_rooms mr
+        WHERE mr.active = true
+        <if test="location != null and location != ''">
+            AND mr.location LIKE CONCAT('%', #{location}, '%')
+        </if>
+        <if test="minCapacity != null">
+            AND mr.capacity >= #{minCapacity}
+        </if>
+        <if test="requiredEquipments != null and requiredEquipments.size() > 0">
+            <foreach collection="requiredEquipments" item="equipment" separator=" AND ">
+                AND JSON_CONTAINS(mr.equipments, CONCAT('"', #{equipment}, '"'))
+            </foreach>
+        </if>
+        AND mr.id NOT IN (
+            SELECT DISTINCT b.meeting_room_id FROM bookings b
+            WHERE b.status = 'ACTIVE'
+            AND ((b.start_time &lt; #{endTime} AND b.end_time &gt; #{startTime}))
+        )
+        ORDER BY mr.location, mr.name
+    </select>
+
+    <insert id="insert">
+        INSERT INTO meeting_rooms (id, name, location, capacity, equipments, active)
+        VALUES (#{id}, #{name}, #{location}, #{capacity}, #{equipments}, #{active})
+    </insert>
+    <update id="update">
+        UPDATE meeting_rooms SET
+        name = #{name},
+        location = #{location},
+        capacity = #{capacity},
+        equipments = #{equipments},
+        active = #{active},
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM meeting_rooms WHERE id = #{id}
+    </delete>
+
+</mapper>

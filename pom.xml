@@ -19,8 +19,10 @@
         <start-class>com.only.ai.boot.ApplicationStarter</start-class>
         <project.encoding>UTF-8</project.encoding>
         <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <revision>1.0.0-SNAPSHOT</revision>
-        <transformer.version>1.2.10</transformer.version>
+
         <spring.boot.version>2.7.10</spring.boot.version>
     </properties>
 
@@ -79,36 +81,6 @@
             <!-- ======= -->
             <!-- 二方依赖 -->
             <!-- ======= -->
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-call</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-common</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-dubbo</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-util</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-exception</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.transformer</groupId>
-                <artifactId>transformer-dao</artifactId>
-                <version>${transformer.version}</version>
-            </dependency>
 <!--            <dependency>-->
 <!--                <groupId>com.transformer</groupId>-->
 <!--                <artifactId>transformer-context</artifactId>-->
@@ -129,6 +101,14 @@
             <!-- ======= -->
             <!-- 三方依赖 -->
             <!-- ======= -->
+            <!-- Spring Framework版本管理 - 确保与Spring Boot 2.7.10兼容 -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>5.3.26</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -143,11 +123,6 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
                 <version>1.5.0.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>5.1.5.RELEASE</version>
             </dependency>
             <!-- alibaba -->
             <dependency>
@@ -193,7 +168,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>

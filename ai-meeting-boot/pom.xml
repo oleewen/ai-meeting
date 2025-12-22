@@ -20,19 +20,43 @@
         <!-- ======= -->
         <dependency>
             <groupId>ai-meeting</groupId>
+            <artifactId>ai-meeting-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai-meeting</groupId>
+            <artifactId>ai-meeting-application</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai-meeting</groupId>
             <artifactId>ai-meeting-infrastructure</artifactId>
         </dependency>
         <dependency>
             <groupId>ai-meeting</groupId>
-            <artifactId>ai-meeting-service</artifactId>
+            <artifactId>ai-meeting-domain</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>ai-meeting</groupId>
+            <artifactId>ai-meeting-common</artifactId>
+        </dependency>
+        
         <!-- ======= -->
         <!-- 三方依赖 -->
         <!-- ======= -->
+        <!-- Spring Boot Starter Web -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- H2数据库 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Spring Boot JDBC Starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
     </dependencies>
 
@@ -44,7 +68,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <mainClass>${start-class}</mainClass>
+                    <mainClass>com.only.ai.boot.SimpleStarter</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>

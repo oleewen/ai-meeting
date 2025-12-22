@@ -1,125 +1,185 @@
-# 工程结构介绍
+# AI会议室预约系统
 
-## 模块依赖关系
+## 项目概述
 
-    --------------              --------------                               ---------------
-    |            |              |            |                               |             |
-    |   client   |              |  service   | /_ __ __ __ __ __ __ __ __ __ |    boot     | 
-    |            |              |            | \                             |             |                                                    
-    --------------              --------------                               ---------------                                                    
-                \                 /        \                                        \               
-                 \               /          \                                        \              
-                  \             /            \                                        \             
-                  _\|         |/_            _\|                                      _\|           
-                  --------------               ---------------               --------------------   
-                  |            |               |             |               |                  |   
-                  |     api    |               | application |               |  infrastructure  |   
-                  |            |               |             |               |                  |   
-                  --------------               ---------------               --------------------   
-                                                             \                  /                   
-                                                              \                /                    
-                                                               \              /                     
-                                                               _\|          |/_                     
-                                                                --------------                      
-                                                                |            |                      
-                                                                |   domain   | 
-                                                                |            |
-                                                                --------------
+这是一个基于Spring Boot的企业级会议室预约管理系统，采用领域驱动设计（DDD）架构，提供完整的会议室查询、预约、管理功能。
 
-## 常见架构模式
-![六边形](六边形架构.png)
+## 技术架构
 
-![洋葱](洋葱架构.png)
+### 架构模式
+- **领域驱动设计（DDD）**：清晰的领域边界和业务逻辑封装
+- **六边形架构**：核心业务逻辑与外部依赖解耦
+- **CQRS模式**：命令查询职责分离
 
-![整洁](整洁架构.png)
+### 技术栈
+- **后端框架**：Spring Boot 2.7.10
+- **数据库**：MySQL + MyBatis
+- **测试框架**：JUnit 5 + jqwik（属性测试）
+- **前端技术**：HTML5 + CSS3 + 原生JavaScript
+- **构建工具**：Maven
 
-## 设计规范
-- ![API设计参考规范](api.md)
-## 各个模块职责
+## 模块结构
 
-- domain：领域服务层
-    - 领域模型层：领域对象model、领域服务service、资源库repository、事件event、查询门面facade
-    - 代码结构如下
-    ```
-    - com.${company}.${businessdomain}.${context}
-      \- domain
-      |- service
-      |- facade
-      |- model
-      |- event
-      \- repository
-    ```
-- application：应用服务层
-    - 面向用例或用户故事，实现处理流程（service）、处理节点（action）
-    - 代码结构如下
-    ```
-    - com.${company}.${businessdomain}.${context}
-      \- application
-        |- service
-        |- action
-        |- command
-        |- query
-        \- result
-    ```
-- infrastructure：资源层，实现数据访问
-    - 含数据访问对象dao、数据库配置config、数据对象entity、数据映射mapper、数据对象&领域对象工厂
-    - 代码结构如下
-    ```
-    - com.${company}.${businessdomain}.${context}
-      \- infrastructure
-        |- dao
-        |- config
-        |- entity
-        |- mapper
-        |- message
-        |- dal
-        |- call
-        \- factory
-   ```
-- api：公共api包，含公共常量&通用定义，服务接口定义
-    - RPC服务接口定义Service（api领域开放接口，service领域封闭接口，open开放接口）
-    - 输入输出对象：Request、Response、DTO
-    - 开放的常量const、枚举enum、通用util类、异常类
-    - 代码结构如下
-    ```java
-    - com.${company}.${businessdomain}.${context}
-      |- common
-      | |- consts
-      | |- enums
-      | \- exception
-    - com.${company}.${businessdomain}.${context}
-      \- api|service|open
-        |- module
-        | |- request
-        | |- response
-        | \- dto
-        \- ${Aggregate}Service
-      ```
-- client：实现富客户端
-    - 富客户端
-    - 代码结构如下
-    ```
-    - com.${company}.${businessdomain}.${context}
-      \- ${Aggregate}Client
-    ```
-- service：用户接口层，即表现层，实现表现层逻辑（协议、输入&输出转换）
-    - 定义service层接口（HTTP协议）和实现（RPC协议）
-    - 代码结构如下
-    ```
-    - com.${company}.${businessdomain}.${context}
-        |- message
-        | |- consumer  
-        | \- listener
-        |- job
-        | |- task
-        | \- handle|- service
-        |- rpc
-        | \- ${Aggregate}ServiveImpl
-        \- web
-          |- controller
-          |  \- ${Aggregate}Controller
-          |- request
-          |- response
-          |- config
-          \- filter    
-    ```
+```
+ai-meeting/
+├── ai-meeting-common/          # 公共组件和工具类
+├── ai-meeting-domain/          # 领域层（核心业务逻辑）
+├── ai-meeting-infrastructure/  # 基础设施层（数据持久化）
+├── ai-meeting-application/     # 应用服务层（业务编排）
+├── ai-meeting-api/            # 接口层（REST API）
+├── ai-meeting-service/        # 服务层（扩展服务）
+├── ai-meeting-boot/           # 启动模块（Spring Boot应用）
+└── ai-meeting-client/         # 客户端模块
+```
+
+## 核心功能
+
+### 1. 会议室管理
+- **会议室查询**：支持按时间、地点、容量、设备筛选
+- **可用性检查**：实时查询会议室可用时间段
+- **信息展示**：完整的会议室详情和设备信息
+- **智能排序**：按容量、地点、名称等多维度排序
+
+### 2. 预约管理
+- **预约创建**：支持未来30天内的会议室预约
+- **冲突检测**：智能检测时间冲突并提供替代方案
+- **预约取消**：灵活的预约取消机制
+- **签到功能**：会议开始前的签到确认
+
+### 3. 用户功能
+- **个人预约**：查看和管理个人预约记录
+- **权限控制**：基于角色的访问控制
+- **预约历史**：完整的预约历史记录
+
+### 4. 系统特性
+- **响应式设计**：适配多种设备和分辨率
+- **性能优化**：数据库索引和查询优化
+- **错误处理**：统一的异常处理和错误响应
+- **数据验证**：完整的输入验证和业务规则检查
+
+## 业务规则
+
+### 预约规则
+- 预约时间必须在未来1-30天内
+- 最短预约时长30分钟，最长4小时
+- 只能在工作日（周一至周五）的工作时间（8:00-18:00）预约
+- 同一时间段同一会议室只能有一个有效预约
+
+### 权限规则
+- 普通用户只能查看和管理自己的预约
+- 管理员可以查看和管理所有预约
+- 会议室管理员可以管理特定会议室的预约
+
+## 数据模型
+
+### 核心实体
+- **MeetingRoom**：会议室实体（ID、名称、地点、容量、设备）
+- **Booking**：预约实体（ID、会议室、用户、时间、状态）
+- **User**：用户实体（ID、姓名、邮箱、角色）
+- **TimeSlot**：时间段值对象（开始时间、结束时间）
+
+### 枚举类型
+- **BookingStatus**：预约状态（已预约、已取消、已完成、已签到）
+- **Equipment**：设备类型（投影仪、白板、电话会议、视频会议等）
+- **UserRole**：用户角色（普通用户、管理员、会议室管理员）
+
+## 质量保证
+
+### 测试策略
+- **单元测试**：覆盖核心业务逻辑
+- **属性测试**：使用jqwik进行基于属性的测试
+- **集成测试**：API端到端测试
+- **性能测试**：数据库查询性能验证
+
+### 测试覆盖
+- 会议室可用性查询准确性
+- 筛选条件一致性验证
+- 时间冲突检测正确性
+- 预约创建成功性验证
+- 数据持久化完整性检查
+
+## 部署说明
+
+### 环境要求
+- JDK 8+
+- MySQL 5.7+
+- Maven 3.6+
+
+### 构建命令
+```bash
+# 编译项目
+mvn clean compile
+
+# 运行测试
+mvn test
+
+# 打包应用
+mvn clean package
+
+# 启动应用
+java -jar ai-meeting-boot/target/ai-meeting-boot.jar
+```
+
+### 配置文件
+- `application.yml`：主配置文件
+- `application-dev.yml`：开发环境配置
+- `application-prod.yml`：生产环境配置
+- `application-performance.properties`：性能优化配置
+
+## API接口
+
+### 会议室接口
+- `GET /api/meeting-rooms/search`：搜索会议室
+- `GET /api/meeting-rooms/{id}`：获取会议室详情
+- `GET /api/meeting-rooms`：获取所有活跃会议室
+
+### 预约接口
+- `POST /api/bookings`：创建预约
+- `DELETE /api/bookings/{id}`：取消预约
+- `POST /api/bookings/{id}/checkin`：预约签到
+
+### 用户预约接口
+- `GET /api/bookings/my-bookings`：获取个人预约列表
+
+## 前端界面
+
+### 页面功能
+- **首页**：会议室搜索和筛选
+- **预约页面**：创建和管理预约
+- **个人中心**：查看个人预约历史
+
+### 交互特性
+- 实时搜索和筛选
+- 响应式布局设计
+- 友好的错误提示
+- 流畅的用户体验
+
+## 性能优化
+
+### 数据库优化
+- 复合索引策略
+- 查询语句优化
+- 连接池配置优化
+
+### 应用优化
+- 缓存策略
+- 异步处理
+- 资源压缩
+
+## 开发团队
+
+- **架构设计**：基于DDD和六边形架构
+- **代码质量**：遵循Clean Code原则
+- **测试驱动**：TDD和属性测试相结合
+- **持续集成**：自动化构建和测试
+
+## 版本信息
+
+- **当前版本**：1.0.0-SNAPSHOT
+- **开发状态**：已完成核心功能开发
+- **测试状态**：所有核心测试通过
+- **部署状态**：可部署运行
+
+---
+
+*本项目采用现代化的企业级开发标准，注重代码质量、测试覆盖和系统可维护性。*
