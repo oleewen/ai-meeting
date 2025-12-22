@@ -36,10 +36,13 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
         //添加XML目录
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         try {
-            bean.setMapperLocations(resolver.getResources("classpath:mapper/*mapper.xml"));
+            // 支持jar包内和classpath下的mapper文件
+            // 使用classpath*:来搜索所有jar包中的mapper文件
+            bean.setMapperLocations(resolver.getResources("classpath*:mapper/*Mapper.xml"));
             return bean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new RuntimeException("Failed to load MyBatis mapper files", e);
         }
 
     }

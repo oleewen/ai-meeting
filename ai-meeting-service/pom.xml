@@ -28,10 +28,7 @@
         <!-- ======= -->
         <!-- 二方依赖 -->
         <!-- ======= -->
-        <dependency>
-            <groupId>com.transformer</groupId>
-            <artifactId>transformer-dubbo</artifactId>
-        </dependency>
+        <!-- transformer-dubbo已移除，避免引入titan和Apollo依赖 -->
 
         <!-- ======= -->
         <!-- 三方依赖 -->

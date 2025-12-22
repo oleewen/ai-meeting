@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会议室预约系统 - 查询与预约</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>会议室预约系统</h1>
+        <div class="user-info">
+            <span id="userName"></span>
+            <button id="logoutBtn" class="btn btn-secondary">退出</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="query">查询与预约</button>
+            <button class="tab-btn" data-tab="my-bookings">我的预定</button>
+        </div>
+
+        <!-- 查询与预约标签页 -->
+        <div id="queryTab" class="tab-content active">
+            <div class="search-form">
+                <h2>查询可用会议室</h2>
+                <form id="queryForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">日期：</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="startTime">开始时间：</label>
+                            <input type="time" id="startTime" name="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endTime">结束时间：</label>
+                            <input type="time" id="endTime" name="endTime" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">地点（可选）：</label>
+                            <input type="text" id="location" name="location" placeholder="如：1楼">
+                        </div>
+                        <div class="form-group">
+                            <label for="minCapacity">最小容量（可选）：</label>
+                            <input type="number" id="minCapacity" name="minCapacity" min="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">查询</button>
+                </form>
+            </div>
+
+            <div id="roomList" class="room-list"></div>
+        </div>
+
+        <!-- 我的预定标签页 -->
+        <div id="myBookingsTab" class="tab-content">
+            <div class="filter-form">
+                <h2>我的预定</h2>
+                <form id="filterForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">开始日期：</label>
+                            <input type="date" id="startDate" name="startDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">结束日期：</label>
+                            <input type="date" id="endDate" name="endDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="statusFilter">状态：</label>
+                            <select id="statusFilter" name="status">
+                                <option value="">全部</option>
+                                <option value="PENDING">待开始</option>
+                                <option value="CHECKED_IN">已签到</option>
+                                <option value="COMPLETED">已结束</option>
+                                <option value="CANCELLED">已取消</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">查询</button>
+                    </div>
+                </form>
+            </div>
+            <div id="bookingList" class="booking-list"></div>
+        </div>
+    </div>
+
+    <!-- 预约弹窗 -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>创建预约</h2>
+            <form id="bookingForm">
+                <input type="hidden" id="bookingRoomId">
+                <div class="form-group">
+                    <label>会议室：</label>
+                    <span id="bookingRoomName"></span>
+                </div>
+                <div class="form-group">
+                    <label>日期：</label>
+                    <span id="bookingDate"></span>
+                </div>
+                <div class="form-group">
+                    <label>时间段：</label>
+                    <span id="bookingTime"></span>
+                </div>
+                <div class="form-group">
+                    <label for="subject">会议主题：</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label for="attendeeCount">参会人数（可选）：</label>
+                    <input type="number" id="attendeeCount" name="attendeeCount" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="remark">备注（可选）：</label>
+                    <textarea id="remark" name="remark" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">确认预约</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBookingBtn">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+    <script src="js/booking.js"></script>
+</body>
+</html>
+

@@ -23,14 +23,7 @@
         <!-- ======= -->
         <!-- 二方依赖 -->
         <!-- ======= -->
-        <dependency>
-            <groupId>com.transformer</groupId>
-            <artifactId>transformer-call</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.transformer</groupId>
-            <artifactId>transformer-common</artifactId>
-        </dependency>
+        <!-- transformer依赖已移除，避免引入titan和Apollo依赖 -->
 
         <!-- ======= -->
         <!-- 三方依赖 -->
