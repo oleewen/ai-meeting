@@ -1,8 +1,4 @@
-# room-booking Specification
-
-## Purpose
-TBD - created by archiving change add-meeting-room-booking-system. Update Purpose after archive.
-## 需求
+## 修改需求
 ### 需求：会议室预约
 系统必须提供会议室预约功能，允许用户创建预约记录。系统必须确保预约时间段不与已有预约冲突，并遵守时间范围限制和时长限制等业务规则。系统必须支持根据会议主题通过AI生成会议议程推荐，并允许用户将生成的议程自动填入备注字段。
 

@@ -1,6 +1,8 @@
 package com.only.ai.meetingroom.web.controller;
 
 import com.only.ai.meetingroom.api.common.response.ApiResponse;
+import com.only.ai.meetingroom.application.service.AgendaGenerationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,6 +23,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ApiResponse<Void> handleIllegalStateException(IllegalStateException e) {
         return ApiResponse.error("INVALID_STATE", e.getMessage());
+    }
+
+    @ExceptionHandler(AgendaGenerationException.class)
+    public ApiResponse<Void> handleAgendaGenerationException(AgendaGenerationException e) {
+        return ApiResponse.error("AGENDA_GENERATION_FAILED", e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("参数验证失败");
+        return ApiResponse.error("INVALID_PARAM", message);
     }
 
     @ExceptionHandler(Exception.class)

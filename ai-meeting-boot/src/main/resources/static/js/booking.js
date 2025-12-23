@@ -103,7 +103,102 @@ function openBookingModal(roomId, roomName, date, startTime, endTime) {
     document.getElementById('bookingRoomName').textContent = roomName;
     document.getElementById('bookingDate').textContent = date;
     document.getElementById('bookingTime').textContent = `${startTime} - ${endTime}`;
+    
+    // 清空表单
+    document.getElementById('subject').value = '';
+    document.getElementById('attendeeCount').value = '';
+    document.getElementById('remark').value = '';
+    
+    // 显示模态框
     document.getElementById('bookingModal').style.display = 'block';
+    
+    // 等待DOM更新后设置按钮显示逻辑
+    setTimeout(() => {
+        setupAgendaButtonDisplay();
+    }, 10);
+    
+    // 确保事件监听器已绑定（使用事件委托，只需绑定一次）
+    setupAgendaGenerationHandler();
+}
+
+// 设置AI生成议程按钮的显示逻辑
+function setupAgendaButtonDisplay() {
+    const subjectInput = document.getElementById('subject');
+    const generateBtn = document.getElementById('generateAgendaBtn');
+    
+    if (!subjectInput) {
+        console.error('未找到subject输入框');
+        return;
+    }
+    
+    if (!generateBtn) {
+        console.error('未找到generateAgendaBtn按钮');
+        return;
+    }
+    
+    // 先隐藏按钮（使用setProperty确保可以覆盖内联样式）
+    generateBtn.style.setProperty('display', 'none', 'important');
+    generateBtn.style.setProperty('visibility', 'visible', 'important');
+    
+    // 定义处理函数（每次重新获取元素引用，确保正确）
+    const handleSubjectInput = function(event) {
+        const currentInput = document.getElementById('subject');
+        const currentBtn = document.getElementById('generateAgendaBtn');
+        
+        if (!currentInput || !currentBtn) {
+            console.warn('handleSubjectInput: 元素不存在', { currentInput: !!currentInput, currentBtn: !!currentBtn });
+            return;
+        }
+        
+        const inputValue = currentInput.value || '';
+        const hasContent = inputValue.trim().length > 0;
+        
+        console.log('handleSubjectInput触发:', { 
+            value: inputValue, 
+            hasContent: hasContent,
+            eventType: event ? event.type : 'manual'
+        });
+        
+        if (hasContent) {
+            // 使用setProperty确保可以覆盖任何样式（包括!important）
+            currentBtn.style.setProperty('display', 'block', 'important');
+            currentBtn.style.setProperty('visibility', 'visible', 'important');
+            console.log('按钮已显示', { 
+                computedDisplay: window.getComputedStyle(currentBtn).display,
+                inlineDisplay: currentBtn.style.display 
+            });
+        } else {
+            currentBtn.style.setProperty('display', 'none', 'important');
+            console.log('按钮已隐藏');
+        }
+    };
+    
+    // 移除旧的事件监听器（通过克隆节点）
+    const newSubjectInput = subjectInput.cloneNode(true);
+    subjectInput.parentNode.replaceChild(newSubjectInput, subjectInput);
+    
+    // 重新获取引用
+    const updatedSubjectInput = document.getElementById('subject');
+    if (!updatedSubjectInput) {
+        console.error('替换输入框后无法重新获取元素');
+        return;
+    }
+    
+    // 绑定多个事件，确保实时响应
+    updatedSubjectInput.addEventListener('input', handleSubjectInput, { passive: true });
+    updatedSubjectInput.addEventListener('keyup', handleSubjectInput, { passive: true });
+    updatedSubjectInput.addEventListener('change', handleSubjectInput, { passive: true });
+    updatedSubjectInput.addEventListener('paste', function(e) {
+        // 粘贴事件后延迟检查，确保内容已更新
+        setTimeout(() => handleSubjectInput(e), 10);
+    }, { passive: true });
+    
+    // 立即检查一次（处理已有内容的情况，比如用户粘贴或程序设置值）
+    setTimeout(() => {
+        handleSubjectInput({ type: 'manual' });
+    }, 50);
+    
+    console.log('setupAgendaButtonDisplay: 按钮显示逻辑已设置');
 }
 
 // 关闭预约弹窗
@@ -114,6 +209,131 @@ document.querySelector('.close').addEventListener('click', () => {
 document.getElementById('cancelBookingBtn').addEventListener('click', () => {
     document.getElementById('bookingModal').style.display = 'none';
 });
+
+// AI生成议程 - 使用事件委托，在document上绑定事件，确保即使按钮被替换也能正常工作
+let agendaGenerationHandlerBound = false;
+
+function setupAgendaGenerationHandler() {
+    // 如果已经绑定过，不再重复绑定（使用事件委托，只需绑定一次）
+    if (agendaGenerationHandlerBound) {
+        console.log('事件监听器已绑定，跳过重复绑定');
+        return;
+    }
+    
+    // 使用事件委托，在document上绑定click事件，这样可以捕获所有按钮点击
+    document.addEventListener('click', async (event) => {
+        // 检查点击的是否是AI生成议程按钮（通过ID或类名判断）
+        const clickedElement = event.target;
+        const isGenerateBtn = clickedElement && (
+            clickedElement.id === 'generateAgendaBtn' ||
+            (clickedElement.classList && clickedElement.classList.contains('btn') && 
+             clickedElement.textContent && clickedElement.textContent.includes('AI生成议程'))
+        );
+        
+        if (!isGenerateBtn) {
+            return; // 不是目标按钮，直接返回
+        }
+        
+        // 确保点击发生在预约模态框内
+        const bookingModal = document.getElementById('bookingModal');
+        if (!bookingModal || bookingModal.style.display !== 'block') {
+            return; // 模态框未打开，忽略点击
+        }
+        
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('🎯 检测到AI生成议程按钮点击');
+        
+        const subject = document.getElementById('subject');
+        const subjectValue = subject ? subject.value.trim() : '';
+        
+        if (!subjectValue) {
+            showError('请先输入会议主题');
+            return;
+        }
+        
+        const btn = clickedElement;
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '生成中...';
+        
+        console.log('📝 开始生成议程，主题:', subjectValue);
+        
+        try {
+            const response = await fetch(`${API_BASE}/bookings/agenda-suggestion`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ subject: subjectValue })
+            });
+            
+            console.log('📡 API响应状态:', response.status);
+            const result = await response.json();
+            console.log('📦 API返回结果:', result);
+            
+            if (result.success && result.data && result.data.agenda) {
+                // 直接自动填入备注字段，不弹出预览弹窗
+                const remarkField = document.getElementById('remark');
+                console.log('🔍 查找备注字段，元素:', remarkField);
+                
+                if (remarkField) {
+                    const agendaContent = result.data.agenda;
+                    
+                    // 直接填入备注字段
+                    remarkField.value = agendaContent;
+                    
+                    // 触发事件，确保表单验证等逻辑能正常工作
+                    remarkField.dispatchEvent(new Event('input', { bubbles: true }));
+                    remarkField.dispatchEvent(new Event('change', { bubbles: true }));
+                    
+                    // 滚动到备注字段，让用户看到填入的内容
+                    setTimeout(() => {
+                        remarkField.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        remarkField.focus();
+                    }, 100);
+                    
+                    showSuccess('议程已自动填入备注字段');
+                    console.log('✅ 议程已成功填入备注字段');
+                    console.log('   内容长度:', agendaContent.length, '字符');
+                    console.log('   内容预览:', agendaContent.substring(0, 150) + '...');
+                    console.log('   备注字段当前值长度:', remarkField.value.length, '字符');
+                    
+                    // 验证填入是否成功
+                    if (remarkField.value === agendaContent) {
+                        console.log('✅ 验证通过：备注字段内容与API返回一致');
+                    } else {
+                        console.error('❌ 验证失败：备注字段内容与API返回不一致');
+                        console.error('   期望长度:', agendaContent.length);
+                        console.error('   实际长度:', remarkField.value.length);
+                    }
+                } else {
+                    console.error('❌ 未找到备注字段，ID: remark');
+                    // 尝试查找所有textarea元素
+                    const allTextareas = document.querySelectorAll('textarea');
+                    console.error('   找到的textarea元素数量:', allTextareas.length);
+                    allTextareas.forEach((ta, index) => {
+                        console.error(`   textarea[${index}]: id=${ta.id}, name=${ta.name}`);
+                    });
+                    showError('未找到备注字段');
+                }
+            } else {
+                console.error('❌ API返回失败:', result);
+                showError(result.message || 'AI服务暂时不可用，请稍后重试或手动输入备注');
+            }
+        } catch (error) {
+            console.error('❌ AI生成议程请求失败:', error);
+            console.error('   错误详情:', error.stack);
+            showError('请求超时，请稍后重试或手动输入备注');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    }, true); // 使用捕获阶段，确保能捕获到事件
+    
+    agendaGenerationHandlerBound = true;
+    console.log('✅ AI生成议程事件监听器已绑定（使用document事件委托）');
+}
 
 // 创建预约
 document.getElementById('bookingForm').addEventListener('submit', async (e) => {
@@ -297,4 +517,7 @@ function showSuccess(message) {
 checkLogin();
 // 设置默认日期为今天
 document.getElementById('date').valueAsDate = new Date();
+
+// 确保AI生成议程按钮的事件监听器已绑定
+setupAgendaGenerationHandler();
 

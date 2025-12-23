@@ -1,8 +1,12 @@
 package com.only.ai.meetingroom.web.controller;
 
+import com.only.ai.meetingroom.api.booking.request.AgendaSuggestionRequest;
 import com.only.ai.meetingroom.api.booking.request.CreateBookingRequest;
+import com.only.ai.meetingroom.api.booking.response.AgendaSuggestionResponse;
 import com.only.ai.meetingroom.api.booking.response.BookingDTO;
 import com.only.ai.meetingroom.api.common.response.ApiResponse;
+import com.only.ai.meetingroom.application.service.AgendaGenerationApplicationService;
+import com.only.ai.meetingroom.application.service.AgendaGenerationException;
 import com.only.ai.meetingroom.application.service.BookingCreateApplicationService;
 import com.only.ai.meetingroom.application.service.BookingManagementApplicationService;
 import com.only.ai.meetingroom.domain.model.Booking;
@@ -12,6 +16,7 @@ import com.only.ai.meetingroom.domain.repository.RoomRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +32,16 @@ import java.util.stream.Collectors;
 public class BookingController {
     private final BookingCreateApplicationService bookingCreateApplicationService;
     private final BookingManagementApplicationService bookingManagementApplicationService;
+    private final AgendaGenerationApplicationService agendaGenerationApplicationService;
     private final RoomRepository roomRepository;
 
     public BookingController(BookingCreateApplicationService bookingCreateApplicationService,
                              BookingManagementApplicationService bookingManagementApplicationService,
+                             AgendaGenerationApplicationService agendaGenerationApplicationService,
                              RoomRepository roomRepository) {
         this.bookingCreateApplicationService = bookingCreateApplicationService;
         this.bookingManagementApplicationService = bookingManagementApplicationService;
+        this.agendaGenerationApplicationService = agendaGenerationApplicationService;
         this.roomRepository = roomRepository;
     }
 
@@ -122,6 +130,27 @@ public class BookingController {
                 new User.UserId(userId)
         );
         return ApiResponse.success(toDTO(booking));
+    }
+
+    /**
+     * 生成会议议程推荐
+     */
+    @PostMapping("/agenda-suggestion")
+    public ApiResponse<AgendaSuggestionResponse> generateAgendaSuggestion(
+            @Valid @RequestBody AgendaSuggestionRequest request,
+            HttpSession session) {
+        // 验证用户已登录
+        getUserId(session);
+
+        try {
+            String agenda = agendaGenerationApplicationService.generateAgenda(request.getSubject());
+            AgendaSuggestionResponse response = new AgendaSuggestionResponse();
+            response.setAgenda(agenda);
+            return ApiResponse.success(response);
+        } catch (AgendaGenerationException e) {
+            // 返回友好的错误提示
+            return ApiResponse.error("AGENDA_GENERATION_FAILED", e.getMessage());
+        }
     }
 
     private Long getUserId(HttpSession session) {

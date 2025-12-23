@@ -10,7 +10,9 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.lang.NonNull;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -24,9 +26,20 @@ import java.util.List;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.only.ai"})
-public class ApplicationStarter extends WebMvcConfigurerAdapter {
+public class ApplicationStarter implements WebMvcConfigurer {
+    
+    /**
+     * 配置静态资源处理器
+     */
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
+        // 配置静态资源路径，支持访问static目录下的文件
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/");
+    }
+    
+    @Override
+    public void configureMessageConverters(@NonNull List<HttpMessageConverter<?>> converters) {
         ObjectMapper objectMapper = new ObjectMapper();
         //蛇皮走位
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
