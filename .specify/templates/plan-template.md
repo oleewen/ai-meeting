@@ -33,11 +33,13 @@
 **规范符合性检查**（基于 `.specify/memory/constitution.md`）：
 
 - [ ] **语言要求**：所有文档、注释、API描述使用中文
-- [ ] **架构分层**：新功能遵循domain → application → infrastructure → service的分层依赖规则
-- [ ] **代码组织**：包结构符合规范（domain、application、infrastructure、api、service、client）
-- [ ] **测试优先**：已规划测试策略（单元测试、集成测试、契约测试）
-- [ ] **依赖管理**：新增依赖已评审，版本号明确，无跨层依赖
-- [ ] **性能约束**：API响应时间、扩展性等性能要求已考虑
+- [ ] **架构分层**：新功能遵循domain → application → infrastructure → service的分层依赖规则，前后端分离
+- [ ] **代码组织**：包结构符合规范（domain、application、infrastructure、api、service、client、common、boot、frontend）
+- [ ] **测试优先**：已规划测试策略（单元测试、集成测试、契约测试），后端使用JUnit 5/Mockito，前端使用React Testing Library
+- [ ] **依赖管理**：新增依赖已评审，版本号明确，无跨层依赖，Maven依赖统一在父POM管理
+- [ ] **技术栈**：后端使用Java 17 + Spring Boot 2.7.10 + MyBatis，前端使用TypeScript + React 19 + Ant Design
+- [ ] **JSON序列化**：API使用snake_case命名策略
+- [ ] **性能约束**：API响应时间P95 < 200ms、扩展性等性能要求已考虑
 
 **违反项说明**（如有）：[列出任何违反规范的情况及理由]
 

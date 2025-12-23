@@ -1,15 +1,20 @@
 <!--
 Sync Impact Report:
-Version change: 1.0.0 → 1.1.0 (template localization)
-Modified principles: None
-Added sections: None
+Version change: 1.1.0 → 1.2.0 (基于实际代码更新技术栈和架构规范)
+Modified principles: 
+  - Architecture Standards: 添加前端技术栈、更新API文档工具、添加JSON序列化规范
+  - Code Organization Standards: 添加common模块说明、完善包结构描述
+Added sections: 
+  - 前端技术栈要求
+  - JSON序列化规范
+  - common模块说明
 Removed sections: None
 Templates requiring updates:
-  ✅ plan-template.md - 完整中文化，规范检查部分已更新
-  ✅ spec-template.md - 完整中文化
-  ✅ tasks-template.md - 完整中文化
-  ✅ checklist-template.md - 完整中文化
-  ✅ agent-file-template.md - 完整中文化
+  ✅ plan-template.md - 已包含前后端技术栈检查项
+  ✅ spec-template.md - 已支持前后端分离架构
+  ✅ tasks-template.md - 已支持前后端任务分离
+  ✅ checklist-template.md - 无需更新
+  ✅ agent-file-template.md - 无需更新
 Follow-up TODOs: None
 -->
 
@@ -21,14 +26,16 @@ Follow-up TODOs: None
 所有项目交互、响应、文档生成、代码注释、API文档、用户界面文本等均使用中文作为默认语言。英文仅在技术术语、框架名称、第三方库名称等无法避免的情况下使用。此原则确保项目团队和用户能够以最自然的方式理解和协作。
 
 ### II. 分层架构原则 (Layered Architecture)
-项目采用六边形架构（Hexagonal Architecture）/洋葱架构（Onion Architecture）/整洁架构（Clean Architecture）模式，严格遵循分层依赖规则：
+项目采用前后端分离架构，后端采用六边形架构（Hexagonal Architecture）/洋葱架构（Onion Architecture）/整洁架构（Clean Architecture）模式，严格遵循分层依赖规则：
 - **domain层**：领域模型、领域服务、资源库接口、领域事件、查询门面，不依赖任何基础设施
 - **application层**：应用服务、用例处理节点、命令/查询、结果对象，仅依赖domain层
 - **infrastructure层**：数据访问实现、外部服务调用、消息处理，实现domain层定义的接口
 - **api层**：公共接口定义、DTO、常量、枚举，可被service层和client层依赖
-- **service层**：表现层，HTTP控制器、RPC服务实现，依赖application和infrastructure层
+- **service层**：表现层，HTTP控制器、RPC服务实现、定时任务，依赖application和infrastructure层
 - **client层**：富客户端实现，依赖api层
 - **boot层**：应用启动入口，组装各层组件
+- **common层**：通用领域对象和工具类，可被domain层和其他层依赖
+- **frontend层**：前端React应用，通过HTTP API与后端通信，独立部署和运行
 
 ### III. 测试优先原则 (Test-First Development)
 所有新功能必须遵循测试驱动开发（TDD）流程：
@@ -43,9 +50,12 @@ Follow-up TODOs: None
 - **domain层**：`com.only.ai.{context}.domain` 包含 service、facade、model、event、repository
 - **application层**：`com.only.ai.{context}.application` 包含 service、action、command、query、result
 - **infrastructure层**：`com.only.ai.{context}.infrastructure` 包含 dao、config、entity、mapper、message、dal、call、factory
-- **api层**：`com.only.ai.{context}.api|service|open` 包含 request、response、dto、Service接口
+- **api层**：`com.only.ai.{context}.api` 包含 request、response、dto、Service接口
 - **service层**：`com.only.ai.{context}` 包含 message、job、rpc、web（controller、request、response、config、filter）
 - **client层**：`com.only.ai.{context}.{Aggregate}Client`
+- **common层**：`com.only.ai.common.domain` 包含通用领域对象（如ValueObject、Id、MonetaryAmount等）
+- **boot层**：`com.only.ai.boot` 包含应用启动类
+- **frontend层**：`src/` 包含 components、pages、services、utils，使用TypeScript编写
 代码注释、类名、方法名使用中文描述业务含义，技术实现细节可用英文术语。
 
 ### V. 依赖管理原则 (Dependency Management)
@@ -56,19 +66,37 @@ Follow-up TODOs: None
 
 ## Architecture Standards
 
-### 技术栈要求
+### 后端技术栈要求
 - **语言**：Java 17
 - **框架**：Spring Boot 2.7.10
-- **构建工具**：Maven
+- **构建工具**：Maven 3.6+
 - **编码规范**：UTF-8
-- **数据库访问**：MyBatis
-- **API文档**：Swagger（使用中文描述）
+- **数据库访问**：MyBatis 2.3.2
+- **数据库**：H2（开发/测试环境），支持迁移到PostgreSQL/MySQL
+- **API文档**：SpringDoc OpenAPI 1.6.9（使用中文描述）
+- **对象映射**：MapStruct 1.5.0.Final
+- **代码生成**：Lombok 1.18.34
+- **连接池**：Druid 1.2.23
+- **JSON序列化**：Jackson，使用snake_case命名策略（PropertyNamingStrategy.SNAKE_CASE）
+- **测试框架**：JUnit 5、Mockito、Spring Boot Test
+
+### 前端技术栈要求
+- **语言**：TypeScript 4.9.5
+- **框架**：React 19.2.3
+- **UI组件库**：Ant Design 6.1.1
+- **路由**：React Router 7.11.0
+- **HTTP客户端**：Axios 1.13.2
+- **构建工具**：React Scripts 5.0.1
+- **测试框架**：React Testing Library、Jest
+- **日期处理**：dayjs 1.11.19
 
 ### 性能与约束
 - API响应时间：P95延迟 < 200ms（除非业务场景特殊要求）
 - 系统必须支持水平扩展
 - 数据库连接池使用Druid，必须配置合理的连接数
 - 日志必须结构化，便于监控和排查
+- 前端应用必须支持主流浏览器（Chrome、Edge、Firefox等），分辨率≥1366×768
+- 前后端通过RESTful API通信，使用JSON格式，字段命名采用snake_case
 
 ## Development Workflow
 
@@ -100,4 +128,4 @@ Follow-up TODOs: None
 
 所有PR和代码审查必须验证是否符合本规范。任何违反规范的情况必须说明理由并获得批准。
 
-**Version**: 1.1.0 | **Ratified**: 2025-01-27 | **Last Amended**: 2025-01-27
+**Version**: 1.2.0 | **Ratified**: 2025-01-27 | **Last Amended**: 2025-01-28
