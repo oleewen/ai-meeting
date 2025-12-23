@@ -1,5 +1,5 @@
 <!-- OPENSPEC:START -->
-# Agent使用说明
+# Agent 使用说明
 
 这些说明适用于在此项目中工作的AI助手。
 
