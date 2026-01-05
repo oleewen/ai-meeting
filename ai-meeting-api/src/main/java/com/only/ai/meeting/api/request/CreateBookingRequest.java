@@ -1,8 +1,5 @@
 package com.only.ai.meeting.api.request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,7 +13,6 @@ import java.time.LocalTime;
  * @author AI Meeting Team
  * @since 2025-01-27
  */
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CreateBookingRequest {
     @NotNull(message = "会议室ID不能为空")
     private Long roomId;
